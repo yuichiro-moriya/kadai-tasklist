@@ -4,7 +4,7 @@ class TasksController < ApplicationController
   
   
   def index
-    @tasks = Task.all.page(params[:page]).per(7)
+    @tasks = current_user.tasks.page(params[:page]).per(7)
   end
   
   def show
@@ -29,12 +29,12 @@ class TasksController < ApplicationController
   end
   
   def edit
-    @task.edit
+   @task = current_user.tasks.find(params[:id])
   end
   
   def update
     
-    if @task.update
+    if  @task = current_user.tasks.find(params[:id])
       flash[:success] = 'Task は正常に更新されました'
       redirect_to @task
     else
@@ -52,15 +52,16 @@ class TasksController < ApplicationController
 
   private
 
-def correct_user
-  @task = current_user.tasks.find_by(id: params[:id])
-  unless @task
-   redirect_to root_path
-  end
 
   # Strong Parameter
   def task_params
     params.require(:task).permit(:content, :status)
   end
-end
+  
+  def correct_user
+    @task = current_user.tasks.find_by(id: params[:id])
+    unless @task
+     redirect_to root_path
+    end
+  end
 end
